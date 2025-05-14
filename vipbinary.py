@@ -1,9 +1,8 @@
-#script by @christophersaldanha
-
 import telebot
 import subprocess
 import datetime
 import os
+import sys
 
 from keep_alive import keep_alive
 keep_alive()
@@ -84,8 +83,6 @@ def record_command_logs(user_id, command, target=None, port=None, time=None):
     with open(LOG_FILE, "a") as file:
         file.write(log_entry + "\n")
 
-import datetime
-
 # Dictionary to store the approval expiry date for each user
 user_approval_expiry = {}
 
@@ -139,7 +136,6 @@ def add_user(message):
                 response = "Invalid duration format. Please provide a positive integer followed by 'hour(s)', 'day(s)', 'week(s)', or 'month(s)'."
                 bot.reply_to(message, response)
                 return
-
             if user_to_add not in allowed_user_ids:
                 allowed_user_ids.append(user_to_add)
                 with open(USER_FILE, "a") as file:
@@ -167,8 +163,6 @@ def get_user_info(message):
     remaining_time = get_remaining_approval_time(user_id)
     response = f"👤 Your Info:\n\n🆔 User ID: <code>{user_id}</code>\n📝 Username: {username}\n🔖 Role: {user_role}\n📅 Approval Expiry Date: {user_approval_expiry.get(user_id, 'Not Approved')}\n⏳ Remaining Approval Time: {remaining_time}"
     bot.reply_to(message, response, parse_mode="HTML")
-
-
 
 @bot.message_handler(commands=['remove'])
 def remove_user(message):
@@ -211,7 +205,6 @@ def clear_logs_command(message):
         response = "You have not purchased yet purchase now from :- @christophersaldanha ❄."
     bot.reply_to(message, response)
 
-
 @bot.message_handler(commands=['clearusers'])
 def clear_users_command(message):
     user_id = str(message.chat.id)
@@ -229,7 +222,6 @@ def clear_users_command(message):
     else:
         response = "ꜰʀᴇᴇ ᴋᴇ ᴅʜᴀʀᴍ ꜱʜᴀʟᴀ ʜᴀɪ ᴋʏᴀ ᴊᴏ ᴍᴜ ᴜᴛᴛʜᴀ ᴋᴀɪ ᴋʜɪ ʙʜɪ ɢᴜꜱ ʀʜᴀɪ ʜᴏ ʙᴜʏ ᴋʀᴏ ꜰʀᴇᴇ ᴍᴀɪ ᴋᴜᴄʜ ɴʜɪ ᴍɪʟᴛᴀ ʙᴜʏ:- @christophersaldanha 🙇."
     bot.reply_to(message, response)
- 
 
 @bot.message_handler(commands=['allusers'])
 def show_all_users(message):
@@ -273,7 +265,6 @@ def show_recent_logs(message):
         response = "ꜰʀᴇᴇ ᴋᴇ ᴅʜᴀʀᴍ ꜱʜᴀʟᴀ ʜᴀɪ ᴋʏᴀ ᴊᴏ ᴍᴜ ᴜᴛᴛʜᴀ ᴋᴀɪ ᴋʜɪ ʙʜɪ ɢᴜꜱ ʀʜᴀɪ ʜᴏ ʙᴜʏ ᴋʀᴏ ꜰʀᴇᴇ ᴍᴀɪ ᴋᴜᴄʜ ɴʜɪ ᴍɪʟᴛᴀ ʙᴜʏ:- @christophersaldanha ❄."
         bot.reply_to(message, response)
 
-
 # Function to handle the reply when free users run the /bgmi command
 def start_attack_reply(message, target, port, time):
     user_info = message.from_user
@@ -285,7 +276,7 @@ def start_attack_reply(message, target, port, time):
 # Dictionary to store the last time each user ran the /bgmi command
 bgmi_cooldown = {}
 
-COOLDOWN_TIME =0
+COOLDOWN_TIME = 0
 
 # Handler for /bgmi command
 @bot.message_handler(commands=['bgmi'])
@@ -360,9 +351,7 @@ def handle_bgmi(message):
 
     except Exception as e:
         response = f"❌ Error running attack: {str(e)}"
-
     bot.reply_to(message, response)
-
 
 # Add /mylogs command to display logs recorded for bgmi and website commands
 @bot.message_handler(commands=['mylogs'])
@@ -387,8 +376,7 @@ def show_command_logs(message):
 @bot.message_handler(commands=['help'])
 def show_help(message):
     help_text ='''🤖 Available commands:
-💥 /bgmi : Method For Bgmi Servers. 
-💥 /rules : Please Check Before Use !!.
+💥 /bgmi : Method For Bgmi Servers. ... 💥 /rules : Please Check Before Use !!.
 💥 /mylogs : To Check Your Recents Attacks.
 💥 /plan : Checkout Our Botnet Rates.
 💥 /myinfo : TO Check Your WHOLE INFO.
@@ -413,8 +401,7 @@ Official Channel :- @christophersaldanha
 def welcome_start(message):
     user_name = message.from_user.first_name
     response = f'''❄️ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴘʀᴇᴍɪᴜᴍ ᴅᴅᴏs ʙᴏᴛ, {user_name}! ᴛʜɪs ɪs ʜɪɢʜ ǫᴜᴀʟɪᴛʏ sᴇʀᴠᴇʀ ʙᴀsᴇᴅ ᴅᴅᴏs. ᴛᴏ ɢᴇᴛ ᴀᴄᴄᴇss.
-🤖Try To Run This Command : /help 
-✅BUY :- @christophersaldanha'''
+🤖Try To Run This Command : /help ... ✅BUY :- @christophersaldanha'''
     bot.reply_to(message, response)
 
 @bot.message_handler(commands=['rules'])
@@ -482,37 +469,27 @@ def broadcast_message(message):
 
     bot.reply_to(message, response)
 
+# --- RESTART COMMAND BLENDED HERE ---
 
-
-#bot.polling()
-while True:
-    try:
-        bot.polling(none_stop=True)
-    except Exception as e:
-        print(e)
-
-import telebot
-import subprocess
-import sys
-import os
-import datetime
-
-# Example to restart the script
 def restart_script():
     """ Function to restart the script """
     print("Restarting script...")
     python = sys.executable  # Path to the Python interpreter
     os.execl(python, python, *sys.argv)  # Replace the current running script with a new one
 
-# Command handler for restarting the bot
 @bot.message_handler(commands=['restart'])
 def restart_bot(message):
     user_id = str(message.chat.id)
     if user_id in admin_id:
-        restart_script()
         bot.reply_to(message, "Bot is restarting... ✅")
+        restart_script()
     else:
         bot.reply_to(message, "You are not authorized to restart the bot.")
 
+# --- END RESTART COMMAND ---
 
-
+while True:
+    try:
+        bot.polling(none_stop=True)
+    except Exception as e:
+        print(e)
