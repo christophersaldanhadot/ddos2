@@ -491,4 +491,28 @@ while True:
     except Exception as e:
         print(e)
 
+import telebot
+import subprocess
+import sys
+import os
+import datetime
+
+# Example to restart the script
+def restart_script():
+    """ Function to restart the script """
+    print("Restarting script...")
+    python = sys.executable  # Path to the Python interpreter
+    os.execl(python, python, *sys.argv)  # Replace the current running script with a new one
+
+# Command handler for restarting the bot
+@bot.message_handler(commands=['restart'])
+def restart_bot(message):
+    user_id = str(message.chat.id)
+    if user_id in admin_id:
+        restart_script()
+        bot.reply_to(message, "Bot is restarting... ✅")
+    else:
+        bot.reply_to(message, "You are not authorized to restart the bot.")
+
+
 
