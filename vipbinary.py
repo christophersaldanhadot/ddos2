@@ -477,14 +477,20 @@ def restart_script():
     python = sys.executable  # Path to the Python interpreter
     os.execl(python, python, *sys.argv)  # Replace the current running script with a new one
 
+import subprocess
+import sys
+import os
+
 @bot.message_handler(commands=['restart'])
 def restart_bot(message):
     user_id = str(message.chat.id)
     if user_id in admin_id:
         bot.reply_to(message, "Bot is restarting... ✅")
-        restart_script()
+        subprocess.Popen([sys.executable] + sys.argv)
+        os._exit(0)
     else:
         bot.reply_to(message, "You are not authorized to restart the bot.")
+
 
 # --- END RESTART COMMAND ---
 
